@@ -1,0 +1,13 @@
+package com.whi5p3r.spring;
+
+import com.whi5p3r.spring.annotations.Scope;
+
+public enum ScopeType {
+    SINGLETON(1),
+    PROTOTYPE(2)
+    ;
+    final int key;
+    ScopeType(int key){
+        this.key = key;
+    }
+}

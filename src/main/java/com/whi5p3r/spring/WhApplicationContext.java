@@ -28,6 +28,10 @@ public class WhApplicationContext {
      * singletonObjects, 存储所有单例的Bean
      */
     private Map<String,Object> singletonObjects = new HashMap<>();
+    /**
+     * beanPostProcessor, 存储容器所有的BeanPostProcessor
+     */
+    private List<BeanPostProcessor> beanPostProcessorList = new ArrayList<>();
     public WhApplicationContext(Class<?> clz) {
         this.configClazz = clz;
 
@@ -44,7 +48,7 @@ public class WhApplicationContext {
             String beanName = entry.getKey();
             BeanDefinition beanDefinition = entry.getValue();
 
-            if(beanDefinition.getScope().equals("singleton")){
+            if(beanDefinition.getScope().equals(ScopeType.SINGLETON)){
                 // 创建Bean
                 Object object = createBean(beanName,beanDefinition);
                 singletonObjects.put(beanName,object);
@@ -105,6 +109,11 @@ public class WhApplicationContext {
                     try{
                         Class<?> clz = classLoader.loadClass(className);
                         if(clz.isAnnotationPresent(Component.class)){
+                            // 如果当前Component是BeanPostProcessor接口的实现类则直接添加到容器的后处理器集合中
+                            if(BeanPostProcessor.class.isAssignableFrom(clz)){
+                                BeanPostProcessor beanPostProcessor = (BeanPostProcessor) clz.newInstance();
+                                beanPostProcessorList.add(beanPostProcessor);
+                            }
                             Component component = clz.getAnnotation(Component.class);
                             String beanName = component.value();
                             BeanDefinition beanDefinition = new BeanDefinition();
@@ -113,11 +122,15 @@ public class WhApplicationContext {
                                 Scope scope = clz.getAnnotation(Scope.class);
                                 beanDefinition.setScope(scope.value());
                             }else{
-                                beanDefinition.setScope("singleton");
+                                beanDefinition.setScope(ScopeType.SINGLETON);
                             }
                             beanDefinitionMap.put(beanName, beanDefinition);
                         }
                     }catch (ClassNotFoundException e){
+                        throw new RuntimeException(e);
+                    } catch (InstantiationException e) {
+                        throw new RuntimeException(e);
+                    } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -159,6 +172,7 @@ public class WhApplicationContext {
         Class<?> clz = beanDefinition.getClazz();
         Object instance = null;
         try {
+            // 实例化
             instance = clz.newInstance();
 
             // 依赖注入
@@ -174,8 +188,22 @@ public class WhApplicationContext {
                         throw new NullPointerException("The bean \"" + fieldName +"\" is not found!");
                     }
                     // 注入
+                    field.setAccessible(true);
                     field.set(instance, fieldBean);
                 }
+            }
+            // 初始化前
+            for(BeanPostProcessor postProcessor:beanPostProcessorList){
+                instance = postProcessor.postProcessBeforeInitialization(instance,beanName);
+            }
+            // 初始化
+            if(instance instanceof InitializingBean){
+                ((InitializingBean) instance).afterPropertiesSet();
+            }
+
+            // 初始化后
+            for(BeanPostProcessor postProcessor:beanPostProcessorList){
+                instance = postProcessor.postProcessAfterInitialization(instance, beanName);
             }
 
         } catch (InstantiationException e) {

@@ -7,6 +7,6 @@ import com.whi5p3r.spring.annotations.Component;
  * @author: whi5p3r
  * @date: 2023年04月11日 17:31
  */
-@Component
+@Component("orderService")
 public class OrderService {
 }
