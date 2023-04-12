@@ -1,4 +1,4 @@
-package com.whi5p3r.spring;
+package com.whi5p3r.spring.beans.config;
 
 import com.whi5p3r.spring.annotations.Scope;
 

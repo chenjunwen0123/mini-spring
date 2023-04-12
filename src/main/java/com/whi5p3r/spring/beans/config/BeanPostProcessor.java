@@ -1,4 +1,4 @@
-package com.whi5p3r.spring;
+package com.whi5p3r.spring.beans.config;
 
 public interface BeanPostProcessor {
     Object postProcessBeforeInitialization(Object bean, String beanName);

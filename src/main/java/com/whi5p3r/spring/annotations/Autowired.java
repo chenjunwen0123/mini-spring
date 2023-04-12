@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Autowired {
     boolean required() default true;
+    String value() default "";
 }

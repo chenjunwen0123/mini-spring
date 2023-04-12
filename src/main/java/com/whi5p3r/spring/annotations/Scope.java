@@ -1,6 +1,6 @@
 package com.whi5p3r.spring.annotations;
 
-import com.whi5p3r.spring.ScopeType;
+import com.whi5p3r.spring.beans.config.ScopeType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
