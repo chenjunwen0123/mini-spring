@@ -16,4 +16,10 @@ public class StringUtil {
         chars[0] += 32;     //ASCII码中大写字母和小写相差32
         return String.valueOf(chars);
     }
+
+    public static boolean isEmpty(String str){
+        if(null == str || "".equals(str))
+            return true;
+        return false;
+    }
 }

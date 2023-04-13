@@ -1,5 +1,6 @@
 package com.whi5p3r.sample.pojo;
 
+import com.whi5p3r.spring.annotations.Autowired;
 import com.whi5p3r.spring.annotations.Component;
 
 /**
@@ -9,4 +10,6 @@ import com.whi5p3r.spring.annotations.Component;
  */
 @Component("orderService")
 public class OrderService {
+    @Autowired
+    private UserService userService;
 }

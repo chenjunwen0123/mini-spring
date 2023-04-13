@@ -36,7 +36,7 @@ public class BeanDefinitionReader {
      * @param basePackage
      */
     private void doScanner(String basePackage) {
-        URL resource = this.getClass().getClassLoader().getResource(basePackage);
+        URL resource = this.getClass().getClassLoader().getResource(basePackage.replace(".","/"));
         assert resource != null;
         File base = new File(resource.getFile());
 
@@ -61,7 +61,6 @@ public class BeanDefinitionReader {
         try {
             for (String beanClassName : registryBeanClasses) {
                 Class<?> beanClass = Class.forName(beanClassName);
-
                 // 如果不是组件，则不创建BeanDefinition
                 if(! (beanClass.isAnnotationPresent(Controller.class) ||
                         beanClass.isAnnotationPresent(Service.class) ||
